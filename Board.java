@@ -2,6 +2,7 @@ package code;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Board {
@@ -14,7 +15,7 @@ public class Board {
 		for(int x=0; x<9; x++) {
 			for(int y=0; y<9; y++) {
 				board[x][y] = new Cell();
-				board[x][y].setBoxID(3*(x/3) + y/(3+1));
+				board[x][y].setBoxID((x / 3) * 3 + (y / 3));
 			}
 		}
 
@@ -37,6 +38,9 @@ public class Board {
 				int number = input.nextInt();
 				if(number != 0)
 					solve(x, y, number);
+				if(x % 3 == 0 && y % 3 == 0)
+					System.out.printf("BoxID for cell (%d,%d): %d%n", x, y, board[x][y].getBoxID());
+
 			}
 						
 		input.close();
@@ -140,6 +144,9 @@ public class Board {
 				if(errorFound())
 					break;
 				}while(changesMade != 0);
+			
+			if(isSolved() == false && changesMade == 0)
+            	 break;
 		}
 		
 	}
@@ -228,41 +235,49 @@ public class Board {
 		return changesMade;
 	}
 	
-	public int logic3() {
-		int changesMade = 0;
-		
-		for(int z = 0; z < 9; z++)
-		{
-			int canBe = 0;
-			int column = 0;
-			int row = 0;
-			
-			for(int x = 0; x < board.length; x++)
-			{
-				for(int y = 0; y < board[0].length; y++)
-				{	
-					for(int n = 0; n < 10; n++)
-					{
-						if(board[x][y].getBoxID() == z && board[x][y].getNumber() == 0 && board[x][y].canBe(n))
-						{
-							canBe++;
-							row = x;
-							column = y;
-						}		
-					}	
-					
-					if(canBe == 1)
-					{
-						solve(row, column, z);
-						changesMade++;
-					}
-				}
-			}
-		}
-		
-		
-		return changesMade;	
-	}
+	 public int logic3() {
+                int changesMade = 0;
+
+                for (int box = 0; box < 9; box++)
+                {
+                        for (int candidate = 1; candidate <= 9; candidate++)
+                        {
+                                int canBe = 0;
+                                int row = -1;
+                                int column = -1;
+
+                                for (int x = 0; x < board.length; x++)
+                                {
+                                        for (int y = 0; y < board[0].length; y++)
+                                        {
+                                                if (board[x][y].getBoxID() == box && board[x][y].getNumber() == 0 && board[x][y].canBe(candidate))
+                                                {
+                                                        canBe++;
+                                                        row = x;
+                                                        column = y;
+                                                }
+                                        }
+                                }
+
+                                if (canBe == 1)
+                                {
+                                        if (candidate < 1 || candidate > 9)
+                                        {
+                                                System.err.println("logic3 error: invalid candidate " + candidate + " for box " + box + " at (" + row + ", " + column + ")");
+                                        }
+                                        else
+                                        {
+                                                System.out.println("logic3 placing " + candidate + " at (" + row + ", " + column + ")");
+                                                solve(row, column, candidate);
+                                                changesMade++;
+                                        }
+                                }
+                        }
+                }
+
+
+                return changesMade;
+        }
 	
 	public int logic4() {
 		int changesMade = 0;
@@ -277,7 +292,7 @@ public class Board {
 	                {
 	                    if (board[row][j].getNumber() == 0 && board[row][j].numberOfPotentials() == 2) 
 	                    {
-	                        if (board[row][i].getPotential() == board[row][j].getPotential()) 
+	                        if (Arrays.equals(board[row][i].getPotential(), board[row][j].getPotential()))
 	                        {
 	                            for (int k = 0; k < board[row].length; k++) 
 	                            {
@@ -312,7 +327,7 @@ public class Board {
 		                {
 		                    if (board[j][col].getNumber() == 0 && board[j][col].numberOfPotentials() == 2) 
 		                    {
-		                        if (board[i][col].getPotential() == board[j][col].getPotential()) 
+		                         if (Arrays.equals(board[i][col].getPotential(), board[j][col].getPotential()))
 		                        {
 		                            for (int k = 0; k < board.length; k++) 
 		                            {
