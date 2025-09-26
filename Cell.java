@@ -66,10 +66,12 @@ public class Cell {
 		
 		for(int x = 0; x < potential.length; x++)
 		{
-			if(potential[x])
+			if(potential[x] && ! foundFirst)
 			{
 				foundFirst = true;
+				continue;
 			}
+			
 			if(potential[x] && foundFirst)
 			{
 				secondPotential = x;
