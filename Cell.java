@@ -66,7 +66,7 @@ public class Cell {
 		
 		for(int x = 0; x < potential.length; x++)
 		{
-			if(potential[x] && ! foundFirst)
+			if(potential[x] && !foundFirst)
 			{
 				foundFirst = true;
 				continue;
